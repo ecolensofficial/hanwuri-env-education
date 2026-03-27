@@ -30,7 +30,7 @@ export default async function handler(req, res) {
         modalities: ['text', 'audio'],
         audio: {
           voice: 'shimmer',
-          format: 'wav',
+          format: 'pcm16',
         },
         stream: true,
       }),
@@ -65,8 +65,39 @@ export default async function handler(req, res) {
     }
 
     if (audioChunks.length > 0) {
-      const fullAudio = audioChunks.join('');
-      return res.status(200).json({ audio: fullAudio, format: 'wav' });
+      // pcm16 base64 청크를 합치고 WAV 헤더 추가
+      const pcmBase64 = audioChunks.join('');
+      const pcmBuffer = Buffer.from(pcmBase64, 'base64');
+
+      const sampleRate = 24000;
+      const numChannels = 1;
+      const bitsPerSample = 16;
+      const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
+      const blockAlign = numChannels * (bitsPerSample / 8);
+      const dataSize = pcmBuffer.length;
+      const headerSize = 44;
+
+      const wavBuffer = Buffer.alloc(headerSize + dataSize);
+      // RIFF header
+      wavBuffer.write('RIFF', 0);
+      wavBuffer.writeUInt32LE(36 + dataSize, 4);
+      wavBuffer.write('WAVE', 8);
+      // fmt chunk
+      wavBuffer.write('fmt ', 12);
+      wavBuffer.writeUInt32LE(16, 16);
+      wavBuffer.writeUInt16LE(1, 20); // PCM
+      wavBuffer.writeUInt16LE(numChannels, 22);
+      wavBuffer.writeUInt32LE(sampleRate, 24);
+      wavBuffer.writeUInt32LE(byteRate, 28);
+      wavBuffer.writeUInt16LE(blockAlign, 32);
+      wavBuffer.writeUInt16LE(bitsPerSample, 34);
+      // data chunk
+      wavBuffer.write('data', 36);
+      wavBuffer.writeUInt32LE(dataSize, 40);
+      pcmBuffer.copy(wavBuffer, 44);
+
+      const wavBase64 = wavBuffer.toString('base64');
+      return res.status(200).json({ audio: wavBase64, format: 'wav' });
     }
 
     return res.status(200).json({ audio: null });
