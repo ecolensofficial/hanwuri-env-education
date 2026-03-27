@@ -647,9 +647,43 @@
       }
     }
 
-    function speak(text, onEnd) {
+    let currentAudio = null;
+
+    async function speak(text, onEnd) {
+      // 기존 오디오 중지
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+      }
       window.speechSynthesis.cancel();
 
+      try {
+        const response = await fetch('/api/speak', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+
+        const data = await response.json();
+
+        if (data.audio) {
+          // base64 WAV 오디오 재생
+          const audioSrc = `data:audio/wav;base64,${data.audio}`;
+          currentAudio = new Audio(audioSrc);
+          currentAudio.onended = () => { currentAudio = null; if (onEnd) onEnd(); };
+          currentAudio.onerror = () => { currentAudio = null; fallbackSpeak(text, onEnd); };
+          currentAudio.play();
+          return;
+        }
+      } catch (e) {
+        console.warn('AI TTS 실패, 기본 음성으로 전환:', e);
+      }
+
+      // AI TTS 실패 시 기본 Web Speech API로 fallback
+      fallbackSpeak(text, onEnd);
+    }
+
+    function fallbackSpeak(text, onEnd) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'ko-KR';
       utterance.rate = 1.0;
