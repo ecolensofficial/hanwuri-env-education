@@ -647,30 +647,92 @@
       }
     }
 
-    function speak(text, onEnd) {
-      // 기존 음성 중지
-      window.speechSynthesis.cancel();
+    // 최적의 한국어 음성을 찾아 캐시
+    let bestKoVoice = null;
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'ko-KR';
-      utterance.rate = 0.9;
-      utterance.pitch = 1.2;
-
-      // 한국어 음성 찾기
+    function findBestKoreanVoice() {
       const voices = window.speechSynthesis.getVoices();
-      const koVoice = voices.find(v => v.lang.startsWith('ko'));
-      if (koVoice) utterance.voice = koVoice;
+      const koVoices = voices.filter(v => v.lang.startsWith('ko'));
 
-      utterance.onend = () => { if (onEnd) onEnd(); };
-      utterance.onerror = () => { if (onEnd) onEnd(); };
+      if (koVoices.length === 0) return null;
 
-      window.speechSynthesis.speak(utterance);
+      // 우선순위: Google 한국어 여성 > Microsoft 여성 > 기타 한국어
+      const preferred = [
+        'Google 한국의',
+        'Microsoft SunHi',
+        'Microsoft JiYoun',
+        'Yuna',
+        'Heami',
+      ];
+
+      for (const name of preferred) {
+        const found = koVoices.find(v => v.name.includes(name));
+        if (found) return found;
+      }
+
+      // 여성 음성 우선 (Female 키워드)
+      const female = koVoices.find(v =>
+        v.name.toLowerCase().includes('female') ||
+        v.name.includes('여')
+      );
+      if (female) return female;
+
+      return koVoices[0];
     }
 
-    // 음성 목록 로드
+    function speak(text, onEnd) {
+      window.speechSynthesis.cancel();
+
+      // 문장 단위로 나눠서 자연스럽게 읽기
+      const sentences = text.match(/[^.!?~]+[.!?~]*/g) || [text];
+
+      let index = 0;
+
+      function speakNext() {
+        if (index >= sentences.length) {
+          if (onEnd) onEnd();
+          return;
+        }
+
+        const sentence = sentences[index].trim();
+        if (!sentence) {
+          index++;
+          speakNext();
+          return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(sentence);
+        utterance.lang = 'ko-KR';
+        utterance.rate = 0.92;   // 살짝 느리게 → 또박또박 귀여운 느낌
+        utterance.pitch = 1.4;   // 높은 톤 → 어린이/캐릭터 느낌
+        utterance.volume = 1.0;
+
+        if (!bestKoVoice) bestKoVoice = findBestKoreanVoice();
+        if (bestKoVoice) utterance.voice = bestKoVoice;
+
+        utterance.onend = () => {
+          index++;
+          speakNext();
+        };
+        utterance.onerror = () => {
+          index++;
+          speakNext();
+        };
+
+        window.speechSynthesis.speak(utterance);
+      }
+
+      speakNext();
+    }
+
+    // 음성 목록 로드 (브라우저가 준비되면 최적 음성 캐시)
     window.speechSynthesis.onvoiceschanged = () => {
-      window.speechSynthesis.getVoices();
+      bestKoVoice = findBestKoreanVoice();
     };
+    // 초기 로드 시도
+    if (window.speechSynthesis.getVoices().length > 0) {
+      bestKoVoice = findBestKoreanVoice();
+    }
 
     function addHistory(question, answer) {
       const history = document.getElementById('history');
