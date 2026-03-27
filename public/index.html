@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>횡성군 한우리와 함께하는 환경교실</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Jua', sans-serif;
+      background: linear-gradient(135deg, #a8e6cf 0%, #88d8a8 30%, #7ec8e3 70%, #81d4fa 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 배경 장식 */
+    .bg-decoration {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .cloud {
+      position: absolute;
+      background: rgba(255,255,255,0.6);
+      border-radius: 50px;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    .cloud::before, .cloud::after {
+      content: '';
+      position: absolute;
+      background: rgba(255,255,255,0.6);
+      border-radius: 50%;
+    }
+
+    .cloud:nth-child(1) {
+      width: 120px; height: 40px; top: 8%; left: 10%;
+      animation-delay: 0s;
+    }
+    .cloud:nth-child(1)::before { width: 50px; height: 50px; top: -25px; left: 20px; }
+    .cloud:nth-child(1)::after { width: 35px; height: 35px; top: -15px; left: 55px; }
+
+    .cloud:nth-child(2) {
+      width: 100px; height: 35px; top: 15%; right: 15%;
+      animation-delay: -7s;
+    }
+    .cloud:nth-child(2)::before { width: 40px; height: 40px; top: -20px; left: 15px; }
+    .cloud:nth-child(2)::after { width: 30px; height: 30px; top: -12px; left: 45px; }
+
+    .cloud:nth-child(3) {
+      width: 80px; height: 30px; top: 5%; left: 55%;
+      animation-delay: -14s;
+    }
+    .cloud:nth-child(3)::before { width: 35px; height: 35px; top: -18px; left: 10px; }
+    .cloud:nth-child(3)::after { width: 25px; height: 25px; top: -10px; left: 38px; }
+
+    @keyframes float {
+      0%, 100% { transform: translateX(0) translateY(0); }
+      25% { transform: translateX(30px) translateY(-10px); }
+      50% { transform: translateX(15px) translateY(5px); }
+      75% { transform: translateX(-15px) translateY(-5px); }
+    }
+
+    /* 잔디 */
+    .grass {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 80px;
+      background: #4caf50;
+      z-index: 0;
+      border-radius: 50% 50% 0 0 / 30px 30px 0 0;
+    }
+
+    .grass::before {
+      content: '';
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      background: #66bb6a;
+      border-radius: 50% 50% 0 0 / 20px 20px 0 0;
+    }
+
+    /* 헤더 */
+    .header {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 20px 20px 10px;
+    }
+
+    .header h1 {
+      font-size: 2.2em;
+      color: #2e7d32;
+      text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+      margin-bottom: 5px;
+    }
+
+    .header .subtitle {
+      font-size: 1.1em;
+      color: #558b2f;
+    }
+
+    /* 메인 컨테이너 */
+    .main-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 20px 120px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* 캐릭터 영역 */
+    .character-area {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .speech-bubble {
+      background: white;
+      border-radius: 20px;
+      padding: 20px 25px;
+      max-width: 500px;
+      min-height: 60px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      position: relative;
+      margin-bottom: 15px;
+      font-size: 1.15em;
+      line-height: 1.6;
+      color: #333;
+      text-align: center;
+      border: 3px solid #a5d6a7;
+      transition: all 0.3s ease;
+    }
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-top: 15px solid white;
+    }
+
+    .speech-bubble.thinking {
+      border-color: #ffd54f;
+    }
+
+    .character-img {
+      width: 220px;
+      height: 220px;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+      filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+    }
+
+    .character-img.talking {
+      animation: bounce 0.5s ease infinite alternate;
+    }
+
+    @keyframes bounce {
+      from { transform: translateY(0) scale(1); }
+      to { transform: translateY(-8px) scale(1.03); }
+    }
+
+    /* 마이크 버튼 */
+    .mic-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .mic-btn {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      color: white;
+      font-size: 36px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(238, 90, 36, 0.4);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .mic-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 25px rgba(238, 90, 36, 0.5);
+    }
+
+    .mic-btn:active {
+      transform: scale(0.95);
+    }
+
+    .mic-btn.recording {
+      background: linear-gradient(135deg, #ff1744, #d50000);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .mic-btn.disabled {
+      background: #bdbdbd;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.5); }
+      70% { box-shadow: 0 0 0 20px rgba(255, 23, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 23, 68, 0); }
+    }
+
+    .mic-label {
+      font-size: 1.1em;
+      color: #555;
+      text-align: center;
+    }
+
+    .mic-label.recording-text {
+      color: #d50000;
+      animation: blink 1s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* 질문 히스토리 */
+    .history {
+      width: 100%;
+      max-width: 500px;
+      margin-top: 20px;
+    }
+
+    .history-item {
+      background: rgba(255,255,255,0.85);
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .history-item .question {
+      color: #1565c0;
+      font-size: 0.95em;
+      margin-bottom: 8px;
+      padding-left: 25px;
+      position: relative;
+    }
+
+    .history-item .question::before {
+      content: '🙋';
+      position: absolute;
+      left: 0;
+    }
+
+    .history-item .answer {
+      color: #2e7d32;
+      font-size: 0.95em;
+      padding-left: 25px;
+      position: relative;
+    }
+
+    .history-item .answer::before {
+      content: '🐄';
+      position: absolute;
+      left: 0;
+    }
+
+    /* 타이핑 효과 */
+    .typing-dots span {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #81c784;
+      margin: 0 3px;
+      animation: typingDot 1.4s ease-in-out infinite;
+    }
+
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingDot {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-8px); opacity: 1; }
+    }
+
+    /* 텍스트 입력 대안 */
+    .text-input-section {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      max-width: 500px;
+      margin-top: 10px;
+    }
+
+    .text-input-section input {
+      flex: 1;
+      padding: 12px 18px;
+      border-radius: 25px;
+      border: 3px solid #a5d6a7;
+      font-family: 'Jua', sans-serif;
+      font-size: 1em;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .text-input-section input:focus {
+      border-color: #66bb6a;
+    }
+
+    .text-input-section button {
+      padding: 12px 20px;
+      border-radius: 25px;
+      border: none;
+      background: #66bb6a;
+      color: white;
+      font-family: 'Jua', sans-serif;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s;
+      white-space: nowrap;
+    }
+
+    .text-input-section button:hover {
+      background: #4caf50;
+    }
+
+    .or-divider {
+      color: #777;
+      font-size: 0.9em;
+      margin-top: 5px;
+    }
+
+    /* 재활용 팁 카드 */
+    .tips-section {
+      width: 100%;
+      max-width: 500px;
+      margin-top: 25px;
+    }
+
+    .tips-title {
+      font-size: 1.2em;
+      color: #2e7d32;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .tip-card {
+      background: rgba(255,255,255,0.9);
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .tip-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .tip-card .icon {
+      font-size: 2em;
+      margin-bottom: 4px;
+    }
+
+    .tip-card .label {
+      font-size: 0.8em;
+      color: #555;
+    }
+
+    /* 반응형 */
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.6em; }
+      .character-img { width: 160px; height: 160px; }
+      .speech-bubble { font-size: 1em; padding: 15px 18px; }
+      .mic-btn { width: 75px; height: 75px; font-size: 30px; }
+      .tips-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+      .tip-card .icon { font-size: 1.5em; }
+      .tip-card .label { font-size: 0.7em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-decoration">
+    <div class="cloud"></div>
+    <div class="cloud"></div>
+    <div class="cloud"></div>
+  </div>
+  <div class="grass"></div>
+
+  <div class="header">
+    <h1>횡성군 한우리의 환경교실</h1>
+    <p class="subtitle">궁금한 건 한우리에게 물어보세요!</p>
+  </div>
+
+  <div class="main-container">
+    <div class="character-area">
+      <div class="speech-bubble" id="speechBubble">
+        안녕! 나는 횡성군의 <strong>한우리</strong>야! 음메~!<br>
+        환경이나 분리수거에 대해 궁금한 게 있으면<br>
+        아래 마이크 버튼을 눌러서 물어봐요! 🌿
+      </div>
+      <img src="Gemini_Generated_Image_xckze5xckze5xckz.png" alt="한우리 캐릭터" class="character-img" id="characterImg">
+    </div>
+
+    <div class="mic-section">
+      <button class="mic-btn" id="micBtn" onclick="toggleRecording()">
+        🎤
+      </button>
+      <p class="mic-label" id="micLabel">마이크를 눌러서 질문해 보세요!</p>
+    </div>
+
+    <p class="or-divider">또는 직접 입력해 보세요</p>
+
+    <div class="text-input-section">
+      <input type="text" id="textInput" placeholder="질문을 입력하세요..."
+             onkeypress="if(event.key==='Enter') sendTextQuestion()">
+      <button onclick="sendTextQuestion()">질문하기</button>
+    </div>
+
+    <div class="tips-section">
+      <p class="tips-title">이런 것도 물어볼 수 있어요!</p>
+      <div class="tips-grid">
+        <div class="tip-card" onclick="askQuickQuestion('페트병은 어떻게 분리수거 해요?')">
+          <div class="icon">🧴</div>
+          <div class="label">페트병</div>
+        </div>
+        <div class="tip-card" onclick="askQuickQuestion('캔은 어떻게 버려요?')">
+          <div class="icon">🥫</div>
+          <div class="label">캔</div>
+        </div>
+        <div class="tip-card" onclick="askQuickQuestion('유리병은 어떻게 재활용해요?')">
+          <div class="icon">🍾</div>
+          <div class="label">유리병</div>
+        </div>
+        <div class="tip-card" onclick="askQuickQuestion('종이는 어떻게 분리수거 해요?')">
+          <div class="icon">📰</div>
+          <div class="label">종이</div>
+        </div>
+        <div class="tip-card" onclick="askQuickQuestion('음식물 쓰레기는 어떻게 버려요?')">
+          <div class="icon">🍎</div>
+          <div class="label">음식물</div>
+        </div>
+        <div class="tip-card" onclick="askQuickQuestion('비닐은 어떻게 분리수거 해요?')">
+          <div class="icon">🛍️</div>
+          <div class="label">비닐</div>
+        </div>
+        <div class="tip-card" onclick="askQuickQuestion('스티로폼은 어떻게 버려요?')">
+          <div class="icon">📦</div>
+          <div class="label">스티로폼</div>
+        </div>
+        <div class="tip-card" onclick="askQuickQuestion('지구를 지키려면 어떻게 해야 해요?')">
+          <div class="icon">🌍</div>
+          <div class="label">지구보호</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="history" id="history"></div>
+  </div>
+
+  <script>
+    let isRecording = false;
+    let recognition = null;
+    let isProcessing = false;
+
+    // 음성 인식 초기화
+    function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        document.getElementById('micLabel').textContent = '이 브라우저에서는 음성 인식이 지원되지 않아요';
+        document.getElementById('micBtn').classList.add('disabled');
+        return null;
+      }
+
+      const recog = new SpeechRecognition();
+      recog.lang = 'ko-KR';
+      recog.continuous = false;
+      recog.interimResults = false;
+
+      recog.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        stopRecording();
+        askQuestion(transcript);
+      };
+
+      recog.onerror = (event) => {
+        console.error('음성 인식 오류:', event.error);
+        stopRecording();
+        if (event.error === 'no-speech') {
+          showBubble('음메~ 잘 안 들렸어요. 다시 한번 말해줄래요?');
+        }
+      };
+
+      recog.onend = () => {
+        if (isRecording) stopRecording();
+      };
+
+      return recog;
+    }
+
+    function toggleRecording() {
+      if (isProcessing) return;
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    }
+
+    function startRecording() {
+      if (!recognition) recognition = initSpeechRecognition();
+      if (!recognition) return;
+
+      isRecording = true;
+      const btn = document.getElementById('micBtn');
+      const label = document.getElementById('micLabel');
+
+      btn.classList.add('recording');
+      label.textContent = '듣고 있어요... 말해주세요!';
+      label.classList.add('recording-text');
+      showBubble('음메~ 듣고 있어요! 궁금한 걸 물어보세요!');
+
+      recognition.start();
+    }
+
+    function stopRecording() {
+      isRecording = false;
+      const btn = document.getElementById('micBtn');
+      const label = document.getElementById('micLabel');
+
+      btn.classList.remove('recording');
+      label.textContent = '마이크를 눌러서 질문해 보세요!';
+      label.classList.remove('recording-text');
+
+      if (recognition) {
+        try { recognition.stop(); } catch(e) {}
+      }
+    }
+
+    function sendTextQuestion() {
+      const input = document.getElementById('textInput');
+      const question = input.value.trim();
+      if (!question || isProcessing) return;
+      input.value = '';
+      askQuestion(question);
+    }
+
+    function askQuickQuestion(question) {
+      if (isProcessing) return;
+      askQuestion(question);
+    }
+
+    async function askQuestion(question) {
+      if (isProcessing) return;
+      isProcessing = true;
+
+      const btn = document.getElementById('micBtn');
+      btn.classList.add('disabled');
+
+      // 생각 중 표시
+      showBubble('<div class="typing-dots"><span></span><span></span><span></span></div>', true);
+      document.getElementById('speechBubble').classList.add('thinking');
+
+      try {
+        const response = await fetch('/api/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question }),
+        });
+
+        const data = await response.json();
+        const answer = data.answer;
+
+        // 말풍선에 답변 표시
+        document.getElementById('speechBubble').classList.remove('thinking');
+        showBubble(answer);
+
+        // 캐릭터 애니메이션
+        const img = document.getElementById('characterImg');
+        img.classList.add('talking');
+
+        // 음성 출력
+        speak(answer, () => {
+          img.classList.remove('talking');
+        });
+
+        // 히스토리 추가
+        addHistory(question, answer);
+
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('speechBubble').classList.remove('thinking');
+        showBubble('음메~ 지금은 답하기 어려워요. 다시 물어봐 주세요!');
+      } finally {
+        isProcessing = false;
+        btn.classList.remove('disabled');
+      }
+    }
+
+    function showBubble(text, isHTML = false) {
+      const bubble = document.getElementById('speechBubble');
+      if (isHTML) {
+        bubble.innerHTML = text;
+      } else {
+        bubble.textContent = text;
+      }
+    }
+
+    function speak(text, onEnd) {
+      // 기존 음성 중지
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ko-KR';
+      utterance.rate = 0.9;
+      utterance.pitch = 1.2;
+
+      // 한국어 음성 찾기
+      const voices = window.speechSynthesis.getVoices();
+      const koVoice = voices.find(v => v.lang.startsWith('ko'));
+      if (koVoice) utterance.voice = koVoice;
+
+      utterance.onend = () => { if (onEnd) onEnd(); };
+      utterance.onerror = () => { if (onEnd) onEnd(); };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // 음성 목록 로드
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.getVoices();
+    };
+
+    function addHistory(question, answer) {
+      const history = document.getElementById('history');
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.innerHTML = `
+        <div class="question">${escapeHtml(question)}</div>
+        <div class="answer">${escapeHtml(answer)}</div>
+      `;
+      history.insertBefore(item, history.firstChild);
+
+      // 최대 10개만 유지
+      while (history.children.length > 10) {
+        history.removeChild(history.lastChild);
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

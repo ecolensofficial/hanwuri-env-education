@@ -1,0 +1,12 @@
+{
+  "name": "hanwuri-env-education",
+  "version": "1.0.0",
+  "description": "횡성군 한우리와 함께하는 환경교실 - AI 음성 인터랙티브 웹사이트",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0"
+  }
+}
