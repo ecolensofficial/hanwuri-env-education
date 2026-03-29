@@ -366,59 +366,12 @@
     }
 
     /* 재활용 팁 카드 */
-    .tips-section {
-      width: 100%;
-      max-width: 500px;
-      margin-top: 25px;
-    }
-
-    .tips-title {
-      font-size: 1.2em;
-      color: #2e7d32;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    .tips-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .tip-card {
-      background: rgba(255,255,255,0.9);
-      border-radius: 12px;
-      padding: 12px 8px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-
-    .tip-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .tip-card .icon {
-      font-size: 2em;
-      margin-bottom: 4px;
-    }
-
-    .tip-card .label {
-      font-size: 0.8em;
-      color: #555;
-    }
-
     /* 반응형 */
     @media (max-width: 600px) {
       .header h1 { font-size: 1.6em; }
       .character-img { width: 240px; height: 240px; }
       .speech-bubble { font-size: 1em; padding: 15px 18px; }
       .mic-btn { width: 75px; height: 75px; font-size: 30px; }
-      .tips-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
-      .tip-card .icon { font-size: 1.5em; }
-      .tip-card .label { font-size: 0.7em; }
     }
   </style>
 </head>
@@ -460,43 +413,6 @@
       <button onclick="sendTextQuestion()">질문하기</button>
     </div>
 
-    <div class="tips-section">
-      <p class="tips-title">이런 것도 물어볼 수 있어요!</p>
-      <div class="tips-grid">
-        <div class="tip-card" onclick="askQuickQuestion('페트병은 어떻게 분리수거 해요?')">
-          <div class="icon">🧴</div>
-          <div class="label">페트병</div>
-        </div>
-        <div class="tip-card" onclick="askQuickQuestion('캔은 어떻게 버려요?')">
-          <div class="icon">🥫</div>
-          <div class="label">캔</div>
-        </div>
-        <div class="tip-card" onclick="askQuickQuestion('유리병은 어떻게 재활용해요?')">
-          <div class="icon">🍾</div>
-          <div class="label">유리병</div>
-        </div>
-        <div class="tip-card" onclick="askQuickQuestion('종이는 어떻게 분리수거 해요?')">
-          <div class="icon">📰</div>
-          <div class="label">종이</div>
-        </div>
-        <div class="tip-card" onclick="askQuickQuestion('음식물 쓰레기는 어떻게 버려요?')">
-          <div class="icon">🍎</div>
-          <div class="label">음식물</div>
-        </div>
-        <div class="tip-card" onclick="askQuickQuestion('비닐은 어떻게 분리수거 해요?')">
-          <div class="icon">🛍️</div>
-          <div class="label">비닐</div>
-        </div>
-        <div class="tip-card" onclick="askQuickQuestion('스티로폼은 어떻게 버려요?')">
-          <div class="icon">📦</div>
-          <div class="label">스티로폼</div>
-        </div>
-        <div class="tip-card" onclick="askQuickQuestion('지구를 지키려면 어떻게 해야 해요?')">
-          <div class="icon">🌍</div>
-          <div class="label">지구보호</div>
-        </div>
-      </div>
-    </div>
 
     <div class="history" id="history"></div>
   </div>
@@ -585,11 +501,6 @@
       const question = input.value.trim();
       if (!question || isProcessing) return;
       input.value = '';
-      askQuestion(question);
-    }
-
-    function askQuickQuestion(question) {
-      if (isProcessing) return;
       askQuestion(question);
     }
 
